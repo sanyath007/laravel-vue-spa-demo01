@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
+
 import { getLocalUser } from './helper/auth';
 
 Vue.use(Vuex);
@@ -52,11 +54,23 @@ export default new Vuex.Store({
       localStorage.removeItem('user');
       state.isLoggedIn = false;
       state.currentUser = null;
+    },
+    updateCustomer(state, payload) {
+      state.customers = payload;
     }
   },
   actions: {
     login(context) {
       context.commit('login');
+    },
+    getCustomers(context) {
+      axios.get('/api/customers', {
+        headers: {
+          "Authorization": `bearer ${context.state.currentUser.token}`
+        }
+      }).then(res => {
+        context.commit('updateCustomer', res.data.customers);
+      })
     }
   }
 });
