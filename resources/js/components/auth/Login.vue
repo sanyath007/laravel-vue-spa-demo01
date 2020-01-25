@@ -15,6 +15,10 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Login</button>
+
+            <div class="form-group row" v-if="authError">
+              <p class="error">{{ authError }}</p>
+            </div>
           </form>
         </div>
       </div>
@@ -35,6 +39,11 @@ export default {
       }
     }
   },
+  computed: {
+    authError() {
+      return this.$store.getters.authError;
+    }
+  },
   methods: {
     authenticate() {
       this.$store.dispatch('login');
@@ -51,3 +60,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.error {
+  text-align: center;
+  color: red;
+}
+</style>

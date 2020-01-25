@@ -43,5 +43,11 @@ export default {
           return this.$store.getters.currentUser;
       }
   },
+  methods: {
+      logout() {
+          this.$store.commit('logout');
+          this.$router.push('/login')
+      }
+  },
 }
 </script>

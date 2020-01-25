@@ -1,5 +1,27 @@
 import axios from "axios"
 
+export function initialize(store, router) {
+  router.beforeEach((to, from, next) => {
+    const requiresAuth = to.matched.some(rec => rec.meta.requiresAuth);
+    const currentUser = store.state.currentUser;
+
+    if(requiresAuth && !currentUser) {
+        next('/login');
+    } else if(to.path == '/login' && currentUser) {
+        next('/');
+    } else {
+        next();
+    }
+});
+
+axios.interceptors.response.use(null, error => {
+    if(erorr.response.status === 401) {
+        store.commit('logout');
+        router.push('/login');
+    }
+});
+}
+
 export function login(credentials) {
   return new Promise((res, rej) => {
     axios.post('/api/auth/login', credentials)
