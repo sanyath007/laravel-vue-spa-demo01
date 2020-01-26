@@ -6,26 +6,38 @@ export function initialize(store, router) {
     const currentUser = store.state.currentUser;
 
     if(requiresAuth && !currentUser) {
-        next('/login');
+      next('/login');
     } else if(to.path == '/login' && currentUser) {
-        next('/');
+      next('/');
     } else {
-        next();
+      next();
     }
-});
+  });
 
-axios.interceptors.response.use(null, error => {
+  axios.interceptors.response.use(null, error => {
     if(error.response.status === 401) {
-        store.commit('logout');
-        router.push('/login');
+      store.commit('logout');
+      router.push('/login');
     }
-});
+
+    return Promise.reject(error)
+  });
+  
+  if (store.getters.currentUser) {
+    setAuthorization(store.getters.currentUser.token);
+  }
+}
+
+export function setAuthorization(token) {
+  axios.defaults.headers.common['Authorization'] = `bearer ${token}`;
 }
 
 export function login(credentials) {
   return new Promise((res, rej) => {
     axios.post('/api/auth/login', credentials)
       .then(response => {
+        setAuthorization(response.data.access_token);
+
         res(response.data);
       })
       .catch(err => {

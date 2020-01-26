@@ -66,13 +66,11 @@ export default {
         this.errors = errors;
       }
 
-      axios.post('/api/customers/new', this.$data.customer, {
-        headers: {
-          "Authorization": `bearer ${this.currentUser.token}`
-        }
-      }).then(res => {
-        this.$router.push('/customers');
-      }).catch(err => console.log(err));
+      axios.post('/api/customers/new', this.$data.customer)
+        .then(res => {
+          this.$router.push('/customers');
+        })
+        .catch(err => console.log(err));
     },
     getConstrains() {
       return {

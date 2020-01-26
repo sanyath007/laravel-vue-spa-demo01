@@ -36,13 +36,14 @@
 export default {
   name: 'customer-view',
   created() {
-    axios.get(`/api/customers/${this.$route.params.id}`, {
-      headers: {
-        "Authorization": `bearer ${this.currentUser.token}`
-      }
-    }).then(res => {
-      this.customer = res.data.customer;
-    });
+    if(this.customers.length) {
+      this.customer = this.customers.find(c => c.id == this.$route.params.id);
+    } else {
+      axios.get(`/api/customers/${this.$route.params.id}`)
+      .then(res => {
+        this.customer = res.data.customer;
+      });
+    }
   },
   data() {
     return {
@@ -52,6 +53,9 @@ export default {
   computed: {
     currentUser() {
       return this.$store.getters.currentUser;
+    },
+    customers() {
+      return this.$store.getters.customers;
     }
   },
 }

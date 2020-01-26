@@ -64,13 +64,10 @@ export default new Vuex.Store({
       context.commit('login');
     },
     getCustomers(context) {
-      axios.get('/api/customers', {
-        headers: {
-          "Authorization": `bearer ${context.state.currentUser.token}`
-        }
-      }).then(res => {
-        context.commit('updateCustomer', res.data.customers);
-      })
+      axios.get('/api/customers')
+        .then(res => {
+          context.commit('updateCustomer', res.data.customers);
+        });
     }
   }
 });
