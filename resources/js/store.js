@@ -14,7 +14,9 @@ export default new Vuex.Store({
     isLoggedIn: !!user,
     loading: false,
     auth_error: null,
-    customers: []
+    customers: [],
+    pagination: {},
+    responseErrors: null
   },
   getters: {
     isLoading(state) {
@@ -31,6 +33,12 @@ export default new Vuex.Store({
     },
     customers(state) {
       return state.customers;
+    },
+    pagination(state) {
+      return state.pagination;
+    },
+    responseErrors(state) {
+      return state.responseErrors;
     }
   },
   mutations: {
@@ -55,19 +63,52 @@ export default new Vuex.Store({
       state.isLoggedIn = false;
       state.currentUser = null;
     },
-    updateCustomer(state, payload) {
+    customerRequest(state) {
+      state.loading = true;
+    },
+    customerSuccess(state, payload) {
+      state.loading = false;
       state.customers = payload;
+      state.responseErrors = null
+    },
+    customerFailed(state, payload) {
+      state.loading = false;
+      state.customer = null;
+      state.responseErrors = payload
+    },
+    setPagination(state, payload) {
+      state.pagination = payload;
     }
   },
   actions: {
     login(context) {
       context.commit('login');
     },
-    getCustomers(context) {
-      axios.get('/api/customers')
+    getCustomers(context, url) {
+      context.commit('customerRequest');
+
+      let endpoint = url || '/api/customers'
+
+      axios.get(endpoint)
         .then(res => {
-          context.commit('updateCustomer', res.data.customers);
-        });
+          context.commit('customerSuccess', res.data.customers.data);
+
+          context.commit('setPagination', {
+            path: res.data.customers.path,
+            total: res.data.customers.total,
+            per_page: res.data.customers.per_page,
+            current_page: res.data.customers.current_page,
+            last_page: res.data.customers.last_page,
+            next_page_url: res.data.customers.next_page_url,
+            prev_page_url: res.data.customers.prev_page_url,
+            last_page_url: res.data.customers.last_page_url,
+          });
+        })
+        .catch(err => {
+          let errors = { code: err.response.status, message: err.response.statusText };
+
+          context.commit('customerFailed', errors)
+        })
     }
   }
 });

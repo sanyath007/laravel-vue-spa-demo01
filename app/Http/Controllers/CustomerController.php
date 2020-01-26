@@ -10,7 +10,7 @@ class CustomerController extends Controller
 {
     public function all()
     {
-        $customers = Customer::all();
+        $customers = Customer::paginate(10);
 
         return response()->json([
             "customers" => $customers
