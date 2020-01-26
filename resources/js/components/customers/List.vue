@@ -24,7 +24,7 @@
             <td>{{ customer.email }}</td>
             <td>{{ customer.phone }}</td>
             <td>
-              <router-link to="`/customer/${customer.id}`">View</router-link>
+              <router-link :to="`/customers/${customer.id}`">View</router-link>
             </td>
           </tr>
         </template>
